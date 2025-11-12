@@ -1,17 +1,34 @@
-# Upskilling/Reskilling API – FIAP Global Solution 2025
+# Upskilling/Reskilling API · FIAP Global Solution 2025
 
-API RESTful moderna (Java 21, Spring Boot 3.3.x) que apoia o **Futuro do Trabalho (2030+)** com trilhas de upskilling e reskilling, alinhada aos ODS 4, 8, 9 e 10.
+API RESTful em **Java 21 / Spring Boot 3.3** para apoiar o **Futuro do Trabalho (2030+)** com trilhas de upskilling e reskilling. O domínio conecta-se aos ODS **4, 8, 9 e 10** (educação de qualidade, trabalho decente e crescimento, indústria/inovação, redução de desigualdades).
 
-## 🏗️ Tech Stack
-- Java 21, Spring Boot 3.3.x
-- Spring Web, Spring Data JPA, Bean Validation
-- H2 (memória) – com **console em `/h2`**
-- **OpenAPI/Swagger UI em `/docs`** (springdoc)
-- Arquitetura em camadas **Controller → Service → Repository**
-- Seeds com `data.sql`
+## 1) Stack e arquitetura
 
-## ▶️ Como executar localmente
-> Pré-requisitos: Java 21 e Maven 3.9+
+- **Java 21**, **Spring Boot 3.3.x**
+- Spring Web · Spring Data JPA · Bean Validation
+- **H2 (in-memory)** com console em `/h2`
+- **OpenAPI/Swagger UI** em `/docs`
+- Camadas: **Controller → Service → Repository**
+- Seeds via `data.sql` (com ajuste de `IDENTITY` pós-seed)
+
+Estrutura de pacotes (resumo):
+```
+src/main/java/br/com/fiap/upskill
+├─ controller        # Endpoints REST
+├─ service           # Regras de negócio
+├─ repository        # Spring Data JPA
+├─ domain
+│  ├─ entity         # Entidades JPA
+│  └─ enums          # Enumerações de domínio
+├─ dto               # DTOs de entrada/saída
+├─ mapper            # Conversões Entity ↔ DTO
+├─ exception         # Exceções + Handler global
+└─ config            # OpenAPI etc.
+```
+
+## 2) Como executar
+
+Pré-requisitos: **Java 21** e **Maven 3.9+**
 
 ```bash
 mvn spring-boot:run
@@ -19,24 +36,52 @@ mvn spring-boot:run
 ./mvnw spring-boot:run
 ```
 
-- API: http://localhost:8080
-- Swagger UI: http://localhost:8080/docs
-- H2 Console: http://localhost:8080/h2 (JDBC: `jdbc:h2:mem:upskill`, user: `sa`, password vazio)
+- API: `http://localhost:8080`
+- Swagger UI: `http://localhost:8080/docs`
+- H2 Console: `http://localhost:8080/h2`
+  - JDBC: `jdbc:h2:mem:upskill`
+  - user: `sa`
+  - password: (vazio)
 
-## 🗃️ Banco de Dados
-Configuração em `src/main/resources/application.yml`:
-- `ddl-auto: create` – tabelas geradas a partir das entidades
-- Seeds automáticas via `data.sql` (usuários, trilhas, competências e matrículas)
+> Configuração principal em `src/main/resources/application.yml`. O JPA cria as tabelas (`ddl-auto: create`). As cargas iniciais são feitas pelo `data.sql`.
 
-## 📦 Recursos (CRUDs completos)
-### Usuários `/api/usuarios`
+## 3) Modelo de dados (resumo)
+
+Entidades principais:
+- **usuarios** (pessoas na plataforma)
+- **trilhas** (trilhas de aprendizagem)
+- **competencias** (skills do futuro do trabalho)
+- **trilha_competencia** (N:N trilha ↔ competência)
+- **matriculas** (inscrições de usuários em trilhas)
+
+### Competências seed (IDs de referência)
+| ID | Competência               | Categoria        |
+|---:|---------------------------|------------------|
+|  1 | Inteligência Artificial   | Tecnologia       |
+|  2 | Análise de Dados          | Tecnologia       |
+|  3 | Segurança Cibernética     | Tecnologia       |
+|  4 | Computação em Nuvem       | Tecnologia       |
+|  5 | Automação e RPA           | Tecnologia       |
+|  6 | Design de Experiência     | Humana           |
+|  7 | Comunicação               | Humana           |
+|  8 | Pensamento Crítico        | Humana           |
+|  9 | Empatia                   | Humana           |
+| 10 | Green Tech                | Sustentabilidade |
+| 11 | Gestão de Projetos        | Gestão           |
+| 12 | Liderança Colaborativa    | Gestão           |
+
+> Nas páginas do site (SPA em `/`), as trilhas mostram **ID #** e as competências pelos **nomes**.
+
+## 4) Endpoints (CRUDs obrigatórios)
+
+### Usuários — `/api/usuarios`
 - `GET /api/usuarios`
 - `GET /api/usuarios/{id}`
 - `POST /api/usuarios`
 - `PUT /api/usuarios/{id}`
 - `DELETE /api/usuarios/{id}`
 
-**Exemplo de POST**
+Exemplo `POST`:
 ```json
 {
   "nome": "Joana Prado",
@@ -46,14 +91,14 @@ Configuração em `src/main/resources/application.yml`:
 }
 ```
 
-### Trilhas `/api/trilhas`
+### Trilhas — `/api/trilhas`
 - `GET /api/trilhas`
 - `GET /api/trilhas/{id}`
 - `POST /api/trilhas`
 - `PUT /api/trilhas/{id}`
 - `DELETE /api/trilhas/{id}`
 
-**Exemplo de POST**
+Exemplo `POST`:
 ```json
 {
   "nome": "Fundamentos de IA",
@@ -61,23 +106,55 @@ Configuração em `src/main/resources/application.yml`:
   "nivel": "INICIANTE",
   "cargaHoraria": 60,
   "focoPrincipal": "IA",
-  "competenciasIds": [1,8,6]
+  "competenciasIds": [1, 8, 6]
 }
 ```
 
-## ➕ Extras (bônus)
-### Matrículas `/api/matriculas`
-- `POST /api/matriculas` – matricular um usuário em uma trilha
-  - Body: `{ "usuarioId": 1, "trilhaId": 2 }`
+## 5) Extras (bônus)
+
+### Matrículas — `/api/matriculas`
+- `POST /api/matriculas` — body: `{"usuarioId": 1, "trilhaId": 2}`
 - `GET /api/matriculas/usuario/{usuarioId}`
 - `GET /api/matriculas/trilha/{trilhaId}`
 - `POST /api/matriculas/{matriculaId}/cancelar`
 
-## ✅ Validações e Erros
-- Bean Validation com mensagens claras (400)
-- Conflitos de integridade (422), ex.: e-mail duplicado
-- Entidades não encontradas (404)
-- Resposta de erro padronizada:
+### Recomendações — `/api/recomendacoes`
+- `GET /api/recomendacoes/usuario/{usuarioId}`  
+  Ordena trilhas por **score** considerando:
+  - Nível do usuário × nível da trilha
+  - Foco da trilha × área de atuação
+  - Tendências (IA, Dados, Cloud, Segurança, Soft Skills, Green Tech)
+  - Cenários de transição de carreira
+
+## 6) Exemplos rápidos (cURL)
+
+Criar usuário:
+```bash
+curl -X POST http://localhost:8080/api/usuarios   -H "Content-Type: application/json"   -d '{"nome":"Ana Silva","email":"ana.silva@example.com","areaAtuacao":"Dados","nivelCarreira":"PLENO"}'
+```
+
+Criar trilha:
+```bash
+curl -X POST http://localhost:8080/api/trilhas   -H "Content-Type: application/json"   -d '{"nome":"Introdução a Cloud","descricao":"Bases de computação em nuvem","nivel":"INICIANTE","cargaHoraria":40,"focoPrincipal":"Cloud","competenciasIds":[4,11]}'
+```
+
+Matricular:
+```bash
+curl -X POST http://localhost:8080/api/matriculas   -H "Content-Type: application/json"   -d '{"usuarioId":1,"trilhaId":2}'
+```
+
+## 7) Validações, erros e status codes
+
+- **Bean Validation** em DTOs/entidades (ex.: `@NotBlank`, `@Email`, `@Min`, níveis válidos)
+- **Handler global** com exceções de domínio (404/400/422)
+- **Códigos usados**:
+  - 200/201/204 — sucesso
+  - 400 — erro de validação
+  - 404 — não encontrado
+  - 422 — violação de integridade (ex.: e-mail único)
+  - 500 — erro inesperado
+
+Formato de erro:
 ```json
 {
   "timestamp": "2025-11-12T12:00:00Z",
@@ -88,45 +165,23 @@ Configuração em `src/main/resources/application.yml`:
 }
 ```
 
-## 🗂️ Organização do Código
-```
-src/main/java/br/com/fiap/upskill
-├── UpskillApplication.java
-├── config/OpenApiConfig.java
-├── controller (REST Controllers)
-├── domain
-│   ├── entity (JPA Entities)
-│   └── enums
-├── dto (DTOs de entrada/saída)
-├── exception (Exceções + Handler)
-├── mapper (conversores Entity ↔ DTO)
-└── repository / service
-```
+## 8) SPA de apoio (opcional para demo)
 
-## 🌱 Seeds
-- 12 competências, 5 trilhas, 6 usuários e 6 matrículas
-- Vínculos N:N entre trilhas e competências (`trilha_competencia`)
+Uma página estática em `/` permite:
+- listar/criar/editar/excluir **usuários**,
+- criar **trilhas** (com IDs e competências visíveis),
+- **matricular** usuários,
+- ver **recomendações** por usuário.
 
-## 🔒 Status Codes
-- 200/201/204 para sucesso
-- 400 para validações inválidas
-- 404 quando não encontrado
-- 422 para conflitos (e.g., e-mail único)
-- 500 para erros inesperados
+> É apenas para **demonstração**; os critérios de avaliação consideram a **API**.
 
-## 📝 Entrega
-- Inclua este repositório no GitHub/GitLab e envie o link no Teams
-- Na raiz, mantenha:
-  - `README.md` (este arquivo)
-  - Lista de integrantes e RMs
-  - Código-fonte organizado
+## 9) Observações de projeto
 
----
-
-> Dica: Use o **Swagger UI** para testar rapidamente os endpoints (inclui `try-it-out`).
-
-Feito com 💡 para a Global Solution 2025.
+- Seeds incluem usuários, trilhas, competências e matrículas.  
+  Ao final do `data.sql`, o `IDENTITY` é ajustado para evitar colisões de ID em inserts subsequentes.
+- As associações N:N (trilha ↔ competência) são expostas via lista de `competenciasIds` nos DTOs de trilha.
+- Os endpoints REST retornam status/mensagens consistentes para facilitar testes via Swagger/Insomnia/cURL.
 
 
-## 🎨 Front-end leve (SPA estática)
-Página de demonstração em `/` para listar/crear usuários, ver trilhas e criar matrículas.
+
+**Testes rápidos:** utilize o **Swagger UI** em `/docs` para acionar os endpoints com exemplos de payload.
