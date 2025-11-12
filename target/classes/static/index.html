@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upskilling/Reskilling • FIAP GS 2025</title>
+  <script>
+    window.tailwind = { config: { darkMode: "class" } };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-xl md:text-2xl font-bold">Upskilling/Reskilling • <span class="text-indigo-400">FIAP GS 2025</span></h1>
+      <nav class="text-sm flex items-center gap-3">
+        <a href="/docs" class="text-indigo-400 hover:underline">Docs da API</a>
+        <a href="/h2" class="text-indigo-400 hover:underline">H2 Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <section class="grid md:grid-cols-3 gap-4">
+      <div class="bg-gradient-to-br from-indigo-600 to-indigo-500 text-white p-6 rounded-2xl shadow">
+        <h2 class="text-lg font-semibold">Status</h2>
+        <p id="apiStatus" class="mt-1 opacity-90">Checando API…</p>
+      </div>
+      <div class="bg-slate-900 p-6 rounded-2xl shadow border border-slate-800">
+        <h2 class="text-lg font-semibold">Seeds</h2>
+        <ul class="mt-2 text-sm space-y-1">
+          <li><span class="font-semibold">Usuários:</span> <span id="seedUsuarios">—</span></li>
+          <li><span class="font-semibold">Trilhas:</span> <span id="seedTrilhas">—</span></li>
+          <li><span class="font-semibold">Competências:</span> <span id="seedCompetencias">—</span></li>
+          <li><span class="font-semibold">Matrículas:</span> <span id="seedMatriculas">—</span></li>
+        </ul>
+      </div>
+      <div class="bg-slate-900 p-6 rounded-2xl shadow border border-slate-800">
+        <h2 class="text-lg font-semibold">Ações rápidas</h2>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <button id="btnReload" type="button" class="px-3 py-2 rounded-lg bg-slate-200 text-slate-900">Recarregar</button>
+          <a href="#usuarios" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Ir para Usuários</a>
+          <a href="#trilhas" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Ir para Trilhas</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="recomendacoes" class="bg-slate-900 p-6 rounded-2xl shadow border border-slate-800">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <h2 class="text-xl font-semibold">Recomendações de trilhas</h2>
+        <div class="flex items-center gap-2">
+          <select id="recUsuario" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700"></select>
+          <button id="doRecommend" type="button" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Recomendar</button>
+        </div>
+      </div>
+      <div id="recGrid" class="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <section id="usuarios" class="bg-slate-900 p-6 rounded-2xl shadow border border-slate-800">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Usuários</h2>
+        <button id="openUserModal" type="button" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Novo usuário</button>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="text-left border-b border-slate-800">
+            <tr class="text-slate-300">
+              <th class="py-2 pr-4">ID</th>
+              <th class="py-2 pr-4">Nome</th>
+              <th class="py-2 pr-4">Email</th>
+              <th class="py-2 pr-4">Área</th>
+              <th class="py-2 pr-4">Nível</th>
+              <th class="py-2 pr-4">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="usuariosTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="trilhas" class="bg-slate-900 p-6 rounded-2xl shadow border border-slate-800">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Trilhas</h2>
+        <div class="flex gap-2">
+          <button id="openEnrollModal" type="button" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Matricular</button>
+          <button id="openTrilhaModal" type="button" class="px-3 py-2 rounded-lg bg-slate-200 text-slate-900">Nova trilha</button>
+        </div>
+      </div>
+      <div class="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="trilhasGrid"></div>
+    </section>
+  </main>
+
+  <dialog id="userModal" class="rounded-xl p-0 backdrop:bg-black/40">
+    <form method="dialog" class="bg-slate-900 w-[32rem] max-w-[95vw] rounded-xl shadow border border-slate-800">
+      <div class="p-5 border-b border-slate-800">
+        <h3 class="text-lg font-semibold">Novo usuário</h3>
+      </div>
+      <div class="p-5 grid gap-3">
+        <input id="uNome" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Nome completo" required />
+        <input id="uEmail" type="email" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="email@exemplo.com" required />
+        <input id="uArea" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Área de atuação (ex.: Dados)" />
+        <select id="uNivel" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700">
+          <option value="JUNIOR">Júnior</option>
+          <option value="PLENO" selected>Pleno</option>
+          <option value="SENIOR">Sênior</option>
+          <option value="TRANSICAO">Em transição</option>
+        </select>
+      </div>
+      <div class="p-5 flex justify-end gap-2 border-t border-slate-800">
+        <button id="cancelUser" type="button" class="px-3 py-2 rounded-lg border border-slate-700">Cancelar</button>
+        <button id="saveUser" type="button" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="enrollModal" class="rounded-xl p-0 backdrop:bg-black/40">
+    <form method="dialog" class="bg-slate-900 w-[32rem] max-w-[95vw] rounded-xl shadow border border-slate-800">
+      <div class="p-5 border-b border-slate-800">
+        <h3 class="text-lg font-semibold">Matricular usuário em trilha</h3>
+      </div>
+      <div class="p-5 grid gap-3">
+        <input id="mUsuarioId" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="ID do usuário (ex.: 1)" required />
+        <input id="mTrilhaId" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="ID da trilha (ex.: 2)" required />
+      </div>
+      <div class="p-5 flex justify-end gap-2 border-t border-slate-800">
+        <button id="cancelEnroll" type="button" class="px-3 py-2 rounded-lg border border-slate-700">Cancelar</button>
+        <button id="doEnroll" type="button" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Matricular</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="trilhaModal" class="rounded-xl p-0 backdrop:bg-black/40">
+    <form method="dialog" class="bg-slate-900 w-[36rem] max-w-[95vw] rounded-xl shadow border border-slate-800">
+      <div class="p-5 border-b border-slate-800"><h3 class="text-lg font-semibold">Nova trilha</h3></div>
+      <div class="p-5 grid gap-3">
+        <input id="tNome" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Nome" required />
+        <textarea id="tDescricao" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Descrição"></textarea>
+        <div class="grid grid-cols-2 gap-3">
+          <select id="tNivel" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700">
+            <option value="INICIANTE">INICIANTE</option>
+            <option value="INTERMEDIARIO">INTERMEDIARIO</option>
+            <option value="AVANCADO">AVANCADO</option>
+          </select>
+          <input id="tCarga" type="number" min="1" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Carga horária (h)" required />
+        </div>
+        <input id="tFoco" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Foco principal (ex.: IA)" />
+        <input id="tCompetencias" class="border rounded-lg px-3 py-2 bg-slate-800 border-slate-700" placeholder="Competencias IDs (ex.: 1,8,6)" />
+      </div>
+      <div class="p-5 flex justify-end gap-2 border-t border-slate-800">
+        <button id="cancelTrilha" type="button" class="px-3 py-2 rounded-lg border border-slate-700">Cancelar</button>
+        <button id="saveTrilha" type="button" class="px-3 py-2 rounded-lg bg-indigo-600 text-white">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
