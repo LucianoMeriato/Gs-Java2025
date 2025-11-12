@@ -1,4 +1,4 @@
-# Upskilling/Reskilling API · FIAP Global Solution 2025
+#  FIAP · Global Solution 2025
 
 API RESTful em **Java 21 / Spring Boot 3.3** para apoiar o **Futuro do Trabalho (2030+)** com trilhas de upskilling e reskilling. O domínio conecta-se aos ODS **4, 8, 9 e 10** (educação de qualidade, trabalho decente e crescimento, indústria/inovação, redução de desigualdades).
 
