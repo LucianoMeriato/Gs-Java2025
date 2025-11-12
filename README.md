@@ -110,7 +110,7 @@ Exemplo `POST`:
 }
 ```
 
-## 5) Extras (bônus)
+## 5) Extras 
 
 ### Matrículas — `/api/matriculas`
 - `POST /api/matriculas` — body: `{"usuarioId": 1, "trilhaId": 2}`
@@ -165,7 +165,7 @@ Formato de erro:
 }
 ```
 
-## 8) SPA de apoio (opcional para demo)
+## 8) SPA de apoio 
 
 Uma página estática em `/` permite:
 - listar/criar/editar/excluir **usuários**,
@@ -173,7 +173,6 @@ Uma página estática em `/` permite:
 - **matricular** usuários,
 - ver **recomendações** por usuário.
 
-> É apenas para **demonstração**; os critérios de avaliação consideram a **API**.
 
 ## 9) Observações de projeto
 
